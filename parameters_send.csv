@@ -1,0 +1,41 @@
+﻿name,byte_length,signed,units,offset,min,max,default
+Anode PPU 1 Set Voltage,2,1,V,0,0,500,300
+Anode PPU 2 Set Voltage,2,1,V,2,0,500,300
+Cathode PPU 1 Set Voltage,2,1,V,4,0,250,250
+Cathode PPU 1 Set Current,2,1,mA,6,0,1200,300
+Cathode PPU 2 Set Voltage,2,1,V,8,0,250,250
+Cathode PPU 2 Set Current,2,1,mA,10,0,1200,300
+Heater 1 Current,2,1,A,12,0,10,5
+Heater 2 Current,2,1,A,14,0,10,5
+Heater 3 Current,2,1,A,16,0,10,5
+Heater 4 Current,2,1,A,18,0,10,5
+SPARE 1,2,0,SPARE,20,SPARE,SPARE,0
+IEP 1 PWM,1,0,%,22,0,100,100
+IEP 2 PWM,1,0,%,23,0,100,100
+IEP 3 Freq,1,0,dHz,24,0,200,1
+IEP 4 Freq,1,0,dHz,25,0,200,5
+IEP 5 Freq,1,0,dHz,26,0,200,1
+IEP 6 Freq,1,0,dHz,27,0,200,5
+MFC 1 Flow,2,0,%,28,0,110,4
+MFC 2 Flow,2,0,%,30,0,110,25
+MFC 3 Flow,2,0,%,32,0,110,4
+MFC 4 Flow,2,0,%,34,0,110,25
+SPARE 2,2,0,SPARE,36,SPARE,SPARE,0
+MFC 2 Thruster Selector,1,0, bool,38,0,1,0
+MFC 4 Thruster Selector,1,0, bool,39,0,1,0
+MFC 1 Thruster Selector,1,0, bool,40,0,1,0
+MFC 3 Thruster Selector,1,0, bool,41,0,1,0
+Thruster 1 Cathode Selector,1,0, bool,42,0,1,0
+Thruster 2 Cathode Selector,1,0, bool,43,0,1,0
+Anode PPU1 Thruster Selector,1,0, bool,44,0,1,0
+Anode PPU2 Thruster Selector,1,0, bool,45,0,1,0
+Cathode PPU1 Thruster Selector,1,0, bool,46,0,1,0
+Thruster Unit 1 Cathode Selector,1,0, bool,47,0,1,0
+Cathode PPU2 Thruster Selector,1,0, bool,48,0,1,0
+Thruster Unit 2 Cathode Selector,1,0, bool,49,0,1,0
+Anode PPU1 Enable,1,0, bool,50,0,1,1
+Cathode PPU1 Enable,1,0, bool,51,0,1,1
+Test Override,1,0,,52,0,255,0
+SPARE 3,1,0,SPARE,53,SPARE,SPARE,0
+SPARE 4,4,0,SPARE,54,SPARE,SPARE,0
+SPARE 5,2,0,SPARE,58,SPARE,SPARE,0

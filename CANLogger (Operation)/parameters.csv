@@ -1,0 +1,41 @@
+﻿ECU Temp,2,⁰C,0,0,-50,125
+Anode 1 Set Voltage,2,V,2,1,0,600
+Anode 1 Voltage,2,V,4,0,0,600
+Anode 1 Current,2,mA,6,0,0,200
+Anode 1 Temp,2,⁰C,8,0,-55,125
+Heater PPU Temp,2,⁰C,10,0,-55,125
+C1 Set Voltage,2,V,12,1,0,600
+C1 Voltage,2,V,14,0,0,600
+C1 Set Current,2,mA,16,0,0,200
+C1 Current,2,mA,18,0,0,200
+C1 Temp,2,⁰C,20,0,-55,125
+H1 PWM,1,%,22,1,0,100
+H2 PWM,1,%,23,1,0,100
+HP Tank Pressure Transducer,2,bar,24,0,0,120
+LP Tank Pressure Transducer,2,mbar,26,0,0,15
+Anode Pressure Transducer,2,mbar,28,0,0,2
+Cathode Pressure Transducer,2,mbar,30,0,0,2
+HP Tank Temp,2,⁰C,32,0,-55,125
+Driver Circuit Temp ,2,⁰C,34,0,-55,125
+Anode MFC Temp,2,⁰C,36,0,-55,125
+Cathode MFC Temp  ,2,⁰C,38,0,-55,125
+High Pressure Reg Temp,2,⁰C,40,0,-55,125
+IEP 1 (HP Tank),1,%,42,0,0,100
+IEP 2 (LP Tank),1,%,43,0,0,100
+IEP 3 (MFC 1),1,%,44,0,0,100
+IEP 4 (MFC 2),1,%,45,0,0,100
+Anode MFC ,2,%,46,0,0,110
+Cathode MFC,2,%,48,0,0,110
+PMA Switch valve,1,,50,1,0,100
+Memory,1,,51,0,0,100
+Firing Time Set,2,,52,0,0,9999
+Firing counter 1,4,,54,0,0,9999
+Firing Counter 2,4,,58,0,0,9999
+Error vector 1,2,,62,0,0,0
+Error Vector 2,2,,64,0,0,0
+Ignition Mode,1,,66,0,0,1
+Tank indicator,1,,67,1,0,1
+IEP3 Frequency Parameter,2,dHz,68,1,0,200
+IEP4 Frequency Parameter,2,dHz,70,1,0,200
+Heater 1 Frequency Setting,2,Hz,72,0,0,10
+Heater2  Frequency Setting,2,Hz,74,0,0,10

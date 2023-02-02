@@ -1,0 +1,87 @@
+﻿name,byte_length,signed,units,offset,min,max,default
+ECU Temp,2,1,⁰C,0,-55,125,0
+Anode PPU 1 Set Voltage,2,1,V,2,0,500,0
+Anode PPU 1 Voltage,2,1,V,4,0,500,0
+Anode PPU 1 Current,2,1,mA,6,0,250,0
+Anode PPU 1 Temp,2,1,⁰C,8,-55,125,0
+Anode PPU 2 Set Voltage,2,1,V,10,0,500,0
+Anode PPU 2 Voltage,2,1,V,12,0,500,0
+Anode PPU 2 Current,2,1,mA,14,0,250,0
+Anode PPU 2 Temp,2,1,⁰C,16,-55,125,0
+Cathode PPU 1 Set Voltage,2,1,V,18,0,250,0
+Cathode PPU 1 Voltage,2,1,V,20,0,250,0
+Cathode PPU 1 Set Current,2,1,mA,22,0,1200,0
+Cathode PPU 1 Current,2,1,mA,24,0,1200,0
+Cathode PPU 1 Temp,2,1,⁰C,26,-55,125,0
+Cathode PPU 2 Set Voltage,2,1,V,28,0,250,0
+Cathode PPU 2 Voltage,2,1,V,30,0,250,0
+Cathode PPU 2 Set Current,2,1,mA,32,0,1200,0
+Cathode PPU 2 Current,2,1,mA,34,0,1200,0
+Cathode PPU 2 Temp,2,1,⁰C,36,-55,125,0
+Heater Temp,2,1,⁰C,38,-55,125,0
+Heater 1 Current,2,1,A,40,0,10,0
+Heater 1 Voltage,2,1,V,42,0,20,0
+Heater 1 PWM,1,0,%,44,0,100,0
+Heater 2 PWM,1,0,%,45,0,100,0
+Heater 2 Current,2,1,A,46,0,10,0
+Heater 2 Voltage,2,1,V,48,0,20,0
+Heater 3 Current,2,1,A,50,0,10,0
+Heater 3 Voltage,2,1,V,52,0,20,0
+Heater 3 PWM,1,0,%,54,0,100,0
+Heater 4 PWM,1,0,%,55,0,100,0
+Heater 4 Current,2,1,A,56,0,10,0
+Heater 4 Voltage,2,1,V,58,0,20,0
+Thruster 1 Temp,2,1,⁰C,60,-55,125,0
+Thruster 2 Temp,2,1,⁰C,62,-55,125,0
+HP Tank Pressure 1,2,0,bar,64,0,150,0
+HP Tank Pressure 2,2,0,bar,66,0,150,0
+Regulated Pressure 1,2,0,bar,68,0,3,0
+Regulated Pressure 2,2,0,bar,70,0,3,0
+MFC 1 Pressure,2,0,bar,72,0,3,0
+MFC 2 Pressure,2,0,bar,74,0,3,0
+MFC 3 Pressure,2,0,bar,76,0,3,0
+MFC 4 Pressure,2,0,bar,78,0,3,0
+SPARE 1,2,0,SPARE,80,SPARE,SPARE,0
+Tank Temperature 1,2,1,⁰C,82,-55,125,0
+Tank Temperature 2,2,1,⁰C,84,-55,125,0
+MFC 1 Temperature,2,1,⁰C,86,-55,125,0
+MFC 2 Temperature,2,1,⁰C,88,-55,125,0
+MFC 3 Temperature,2,1,⁰C,90,-55,125,0
+MFC 4 Temperature,2,1,⁰C,92,-55,125,0
+Driver Circuit 1 Temp ,2,1,⁰C,94,-55,125,0
+Driver Circuit 2 Temp ,2,1,⁰C,96,-55,125,0
+PMA Temperature,2,1,⁰C,98,-55,125,0
+IEP 1 PWM,1,0,%,100,0,100,0
+IEP 2 PWM,1,0,%,101,0,100,0
+IEP 3 Freq,1,0,dHz,102,0,200,0
+IEP 4 Freq,1,0,dHz,103,0,200,0
+IEP 5 Freq,1,0,dHz,104,0,200,0
+IEP 6 Freq,1,0,dHz,105,0,200,0
+MFC 1 Flow,2,0,%,106,0,110,0
+MFC 2 Flow,2,0,%,108,0,110,0
+MFC 3 Flow,2,0,%,110,0,110,0
+MFC 4 Flow,2,0,%,112,0,110,0
+SPARE 2,2,0,SPARE,114,SPARE,SPARE,0
+MFC 2 Thruster Selector,1,0, bool,116,0,1,0
+MFC 4 Thruster Selector,1,0, bool,117,0,1,0
+MFC 1 Thruster Selector,1,0, bool,118,0,1,0
+MFC 3 Thruster Selector,1,0, bool,119,0,1,0
+Thruster 1 Cathode Selector,1,0, bool,120,0,1,0
+Thruster 2 Cathode Selector,1,0, bool,121,0,1,0
+Anode PPU1 Thruster Selector,1,0, bool,122,0,1,0
+Anode PPU2 Thruster Selector,1,0, bool,123,0,1,0
+Cathode PPU1 Thruster Selector,1,0, bool,124,0,1,0
+Thruster Unit 1 Cathode Selector,1,0, bool,125,0,1,0
+Cathode PPU2 Thruster Selector,1,0, bool,126,0,1,0
+Thruster Unit 2 Cathode Selector,1,0, bool,127,0,1,0
+Anode PPU1 Enable,1,0, bool,128,0,1,0
+Cathode PPU1 Enable,1,0, bool,129,0,1,0
+Test Override,1,0,,130,0,255,0
+Initialisation Mode,1,0,,131,0,255,0
+SPARE 3,2,0,SPARE,132,SPARE,SPARE,0
+SPARE 4,4,0,SPARE,134,SPARE,SPARE,0
+SPARE 5,4,0,SPARE,138,SPARE,SPARE,0
+Error Vector 1,2,0,ERR,142,0,0,0
+Error Vector 2,4,0,ERR,144,0,0,0
+SPARE 6,4,0,SPARE,148,SPARE,SPARE,0
+SPARE 7,2,0,SPARE,152,SPARE,SPARE,0
