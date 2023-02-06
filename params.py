@@ -46,11 +46,12 @@ class Parameter:
 
 
 class ParameterSet:
-    def __init__(self, file: str, name: str, bytes: int = None, pad: int = 1):
+    def __init__(self, file: str, name: str, bytes: int = None, pad: int = 1, check=True):
         self.file = file
         self.set_name = name
         self.params = dict()
         self._pad = pad
+        self.check = check
         if (not Path.is_file(Path(file))):
             raise FileNotFoundError("Parameter file does not exist!", file)
 
@@ -74,7 +75,7 @@ class ParameterSet:
                     if (name in self.params):
                         raise AttributeError("Parameter already exists in parameter list!", name)
                     self.params[name] = Parameter(name, byte_len, signed, units, offset, param_min, param_max, default,
-                                                  check=(False if (units == "ERR") else True))
+                                                  check=(False if (units == "ERR" or not self.check) else True))
                     if (self.params[name].offset > max_offset):
                         max_offset = self.params[name].offset
                         max_offset_bytelen = self.params[name].byte_len
@@ -126,14 +127,14 @@ class ParameterSet:
         return out
 
     def pack(self):
-        out = bytearray([0xf if self._pad else 0x0] * self._bytes)
+        out = bytearray([0xff if self._pad else 0x0] * self._bytes)
         for key, param in self.params.items():
             byte_start = param.offset
             byte_end = param.offset + param.byte_len
             out[byte_start:byte_end] = bytes(param)
         return out
 
-    def unpack(self, data):
+    def unpack(self, data: bytearray):
         if (len(data) < self.min_len):
             raise AttributeError("Given data is too small to be unpacked into parameter set!", self.min_len, len(data))
 
@@ -156,13 +157,17 @@ class ParameterLog:
         if (not (logdir is None)):
             Path(logdir).mkdir(parents=True, exist_ok=True)
             self.filename = Path(logdir) / time.strftime("%Y_%b_%d-%H_%M_%S.csv")
-            self.file = open(self.filename.name, 'w')
+            self.file = open(str(self.filename), 'w', newline='')
             self.writer = csv.writer(self.file)
             self.writer.writerow(["time"] + self.names)
             self.file.flush()
             self.csv = True
 
-    def log_datapoint(self, data, t):
+        self.start_time = time.time()
+
+    def log_datapoint(self, data, t=None):
+        if (t is None):
+            t = time.time()
         row = [t]
         self.parameter_set.unpack(data)
         vals = self.parameter_set.values
@@ -172,6 +177,8 @@ class ParameterLog:
         self.time.append(t)
         if (self.csv):
             self.writer.writerow(row)
+            #print(row)
+            self.file.flush()
 
-    def get_data_series(self, name):
-        return [i for i in self.data[name]], [i for i in self.time]
+    def get_data_series(self, name, elapsed=True):
+        return [i for i in self.data[name]], [(i-self.start_time if elapsed else i) for i in self.time]

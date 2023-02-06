@@ -115,6 +115,7 @@ class OperationConfigWindow(QWidget):
         self.list_view.addItem('default')
         self.list_view.addItems([p.name for p in self.config.presets if p.name != 'default'])
         self.sel_default()
+        self.populate_parameters()
 
     def select_item(self, ind):
         self.sel_preset = ind.data()

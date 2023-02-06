@@ -2,9 +2,9 @@ from crc import crc_16_bytes
 from datetime import datetime
 
 ID = [[0x10], [0x11]]
-OBC_ID = 0x7d0
+OBC_ID = 0x08
 
-SRC_BITS = 12
+SRC_BITS = 8
 DEST_BITS = 8
 FTYPE_BITS = 1
 FCNT_BITS = 8
@@ -68,15 +68,24 @@ def set_time_send(yr, month, day, hour, mins, secs, subsys=0):
     return pack(preamble, ftype, cid, cmd_id, length, param)
 
 
-def start_operation_send(param=0, subsys=0): # 0 for thruster 1, 1 for thruster 2, 2 for custom ignition
+def start_operation_send(param=0, subsys=0):  # 0 for thruster 1, 1 for thruster 2, 2 for custom ignition
     preamble = [0x58, 0x44, 0x41, 0x54]
     ftype = [0x01]
     cid = ID[subsys]
     cmd_id = [0x00, 0x02]
     length = [0x01]
-    param = [0x01 if param == 0 else (0x02 if param == 1 else 0x03) ]
+    param = [0x01 if param == 0 else (0x02 if param == 1 else 0x03)]
 
     return pack(preamble, ftype, cid, cmd_id, length, param)
+
+
+def set_time_receive(frames, subsys=0):
+    ftype = [0x00]
+    cid = ID[subsys]
+    cmd_id = [0x00, 0x01]
+    length = [0x02]
+
+    return unpack(frames, ftype, cid, cmd_id, length)
 
 
 def start_operation_receive(frames, subsys=0):
@@ -195,10 +204,11 @@ def pack(preamble, frame_type, subsys_id, cmd_id, length, param):
 
     frames = []
     for i in range(frame_cnt):
-        can_id = (OBC_ID & bitmask(SRC_BITS)) << (DEST_BITS + FTYPE_BITS + FCNT_BITS)
-        can_id |= (subsys_id[0] & bitmask(DEST_BITS)) << (FTYPE_BITS + FCNT_BITS)
-        can_id |= ((0 if (frame_cnt == 1) else 1) & bitmask(FTYPE_BITS)) << FCNT_BITS
-        can_id |= ((frame_cnt - 1) - i) & bitmask(FCNT_BITS)
+        can_id = (OBC_ID & bitmask(SRC_BITS)) << (DEST_BITS + FTYPE_BITS + FCNT_BITS + pad_bits)
+        can_id |= (subsys_id[0] & bitmask(DEST_BITS)) << (FTYPE_BITS + FCNT_BITS + pad_bits)
+        can_id |= ((0 if (frame_cnt == 1) else 1) & bitmask(FTYPE_BITS)) << (FCNT_BITS + pad_bits)
+        can_id |= (((frame_cnt - 1) - i) & bitmask(FCNT_BITS)) << pad_bits
+        can_id |= bitmask(pad_bits)
 
         frames.append((can_id, fragments[i]))
 
@@ -210,6 +220,7 @@ def unpack(frames, frame_type, subsys_id, cmd_id, length):
     for i in range(len(frames)):
         frame = frames[i]
         buffer = frame.id
+        buffer >>= pad_bits
         frame_cnt = buffer & bitmask(FCNT_BITS)
         if frame_cnt != len(frames) - i - 1:
             return f"Identifier frame count Mismatch: Expected {len(frames) - i}, got {frame_cnt}"
