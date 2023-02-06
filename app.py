@@ -29,8 +29,8 @@ class MainWindow(QMainWindow):
 
         tabs.addTab(OperationWindow(self.config), "Operation")
         tabs.addTab(OperationConfigWindow(self.config), "Parameters")
-        tabs.addTab(LoggingConfigWindow(self.config), "Logging")
-        tabs.addTab(PacketViewWindow(self.config), "Bus")
+        #tabs.addTab(LoggingConfigWindow(self.config), "Logging")
+        #tabs.addTab(PacketViewWindow(self.config), "Bus")
 
         self.setCentralWidget(tabs)
 

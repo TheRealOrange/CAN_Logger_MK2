@@ -46,7 +46,7 @@ class Parameter:
 
 
 class ParameterSet:
-    def __init__(self, file: str, name: str, bytes: int =None, pad: int=1):
+    def __init__(self, file: str, name: str, bytes: int = None, pad: int = 1):
         self.file = file
         self.set_name = name
         self.params = dict()
@@ -102,6 +102,22 @@ class ParameterSet:
         for key, param in self.params.items():
             out[param.name] = param.value
         return out
+
+    def default(self):
+        new_ps = ParameterSet(self.file, self.set_name, self._bytes, self._pad)
+        for p in new_ps:
+            p.value = p.default
+        return new_ps
+
+    def __getitem__(self, item) -> Parameter:
+        return self.params[item]
+
+    def __setitem__(self, key, value):
+        self.params[key].value = value
+
+    def __iter__(self):
+        for x in self.params.values():
+            yield x
 
     def __repr__(self):
         out = f"Parameter Set {self.set_name} from file {self.file}\n"
