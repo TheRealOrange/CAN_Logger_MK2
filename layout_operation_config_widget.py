@@ -179,6 +179,7 @@ class OperationConfigWindow(QWidget):
             if (self.sel_preset in self.config.presets):
                 self.config.presets.remove_preset(self.sel_preset)
                 QMessageBox.information(self, 'Success', f"Preset [{self.sel_preset}] successfully removed")
+                self.load_presets()
             else:
                 QMessageBox.warning(self, 'Error', f"Preset with name: [{self.sel_preset}] doesn't exist!")
 
@@ -199,6 +200,7 @@ class OperationConfigWindow(QWidget):
                         QMessageBox.warning(self, 'Error', f"Could not rename preset:\n{e.message}\n{e.args}")
                         return
                     QMessageBox.information(self, 'Success', f"Preset [{self.sel_preset}] successfully renamed to [{name}")
+                    self.load_presets()
                     return
                 else:
                     QMessageBox.warning(self, 'Error', f"Preset with name: [{name}] already exists!")

@@ -97,7 +97,7 @@ def start_operation_receive(frames, subsys=0):
     return unpack(frames, ftype, cid, cmd_id, length)
 
 
-def stop_operation_send(subsys=0):
+def stop_operation_send(test=False, subsys=0):
     preamble = [0x58, 0x44, 0x41, 0x54]
     ftype = [0x01]
     cid = ID[subsys]
@@ -108,7 +108,7 @@ def stop_operation_send(subsys=0):
     return pack(preamble, ftype, cid, cmd_id, length, param)
 
 
-def stop_operation_receive(frames, subsys=0):
+def stop_operation_receive(frames, test=False, subsys=0):
     ftype = [0x00]
     cid = ID[subsys]
     cmd_id = [0x00, 0x03]
@@ -165,11 +165,11 @@ def data_get_receive(frames, subsys=0):
     return unpack(frames, ftype, cid, cmd_id, length)
 
 
-def data_send_send(data, addr=0xA010, subsys=0):
+def data_send_send(data, addr=0xA010, test=False, subsys=0):
     preamble = [0x58, 0x44, 0x41, 0x54]
     ftype = [0x01]
     cid = ID[subsys]
-    cmd_id = [0x00, 0x06]
+    cmd_id = [0x00, 0x07 if test else 0x06]
     length = [0x44]
 
     size = len(data)
@@ -183,10 +183,10 @@ def data_send_send(data, addr=0xA010, subsys=0):
     return pack(preamble, ftype, cid, cmd_id, length, param)
 
 
-def data_send_receive(frames, subsys=0):
+def data_send_receive(frames, test=False, subsys=0):
     ftype = [0x00]
     cid = ID[subsys]
-    cmd_id = [0x00, 0x06]
+    cmd_id = [0x00, 0x07 if test else 0x06]
     length = [0x02]
 
     return unpack(frames, ftype, cid, cmd_id, length)

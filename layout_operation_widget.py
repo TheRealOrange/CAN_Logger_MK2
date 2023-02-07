@@ -89,7 +89,7 @@ class OperationWindow(QWidget):
         self.logging_label = StateLabel(["Stopped", "Started"], ["#ff4040", "#63ff6b"], curr=0, parent=self)
         self.logging_period1_label = QLabel("Period: ")
         self.logging_period = QSpinBox()
-        self.logging_period.setMinimum(400)
+        self.logging_period.setMinimum(50)
         self.logging_period.setValue(500)
         self.logging_period.setMaximum(10000)
         self.logging_period2_label = QLabel("ms")
@@ -144,6 +144,7 @@ class OperationWindow(QWidget):
         self.param_select_row = QHBoxLayout()
 
         self.param_select_label = QLabel("Parameter: ", parent=self)
+        self.param_select_label.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.param_select_combo = QComboBox(parent=self)
         self.canvas = MplCanvas(self, width=8, height=6, dpi=100)
         self.toolbar = NavigationToolbar2QT(self.canvas, self)
@@ -197,6 +198,8 @@ class OperationWindow(QWidget):
         self.logging_toggle.clicked.connect(self.on_log_button_press)
 
         self.set_time_button.clicked.connect(self.on_set_time)
+
+        self.logging_period.setValue(500)
 
     def on_log_button_press(self):
         self.logging_enable(not self.live_log)
@@ -261,8 +264,8 @@ class OperationWindow(QWidget):
 
     def on_start_operation(self):
         print(self.config.sent_parameters)
-        self.config.send_frames(data_send_send(self.config.sent_parameters.pack(), subsys=self.selected_ecu))
-        resp = data_send_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+        self.config.send_frames(data_send_send(self.config.sent_parameters.pack(), test=self.is_test_checked(), subsys=self.selected_ecu))
+        resp = data_send_receive(self.config.poll_frames(), test=self.is_test_checked(), subsys=self.selected_ecu)
 
         if (isinstance(resp, str)) or resp[:2].hex() != '0000':
             QMessageBox.warning(self, 'Error',
@@ -286,8 +289,8 @@ class OperationWindow(QWidget):
 
     def on_stop_operation(self):
         self.logging_enable(False)
-        self.config.send_frames(stop_operation_send(subsys=self.selected_ecu))
-        resp = stop_operation_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+        self.config.send_frames(stop_operation_send(test=self.is_test_checked(), subsys=self.selected_ecu))
+        resp = stop_operation_receive(self.config.poll_frames(), test=self.is_test_checked(), subsys=self.selected_ecu)
         if (not isinstance(resp, str)) and resp[:2].hex() == '0000':
             self.start = False
             self.init = False
@@ -383,7 +386,7 @@ class OperationWindow(QWidget):
             self.canvas.axes.set_xlabel('time (s)')
             data = self.config.get_log.get_data_series(self.selected_param, elapsed=True)
             range_min = min(self.config.get_parameters[self.selected_param].min, min(data[0]))
-            range_max = max(self.config.get_parameters[self.selected_param].max, max(data[1]))
+            range_max = max(self.config.get_parameters[self.selected_param].max, max(data[0]))
             self.canvas.axes.set_ylim([range_min, range_max])
             self.canvas.axes.plot(data[1], data[0])
             self.canvas.draw()
