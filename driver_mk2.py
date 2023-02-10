@@ -101,7 +101,7 @@ def stop_operation_send(test=False, subsys=0):
     preamble = [0x58, 0x44, 0x41, 0x54]
     ftype = [0x01]
     cid = ID[subsys]
-    cmd_id = [0x00, 0x03]
+    cmd_id = [0x00, 0x09] if test else [0x00, 0x03]
     length = [0x01]
     param = [0x00]
 
@@ -111,7 +111,7 @@ def stop_operation_send(test=False, subsys=0):
 def stop_operation_receive(frames, test=False, subsys=0):
     ftype = [0x00]
     cid = ID[subsys]
-    cmd_id = [0x00, 0x03]
+    cmd_id = [0x00, 0x09] if test else [0x00, 0x03]
     length = [0x02]
 
     return unpack(frames, ftype, cid, cmd_id, length)

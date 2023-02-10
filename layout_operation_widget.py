@@ -271,10 +271,7 @@ class OperationWindow(QWidget):
             QMessageBox.warning(self, 'Error',
                                 f'DATA_SEND failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
             return
-
-        self.config.send_frames(start_operation_send(subsys=self.selected_ecu))
-        resp = start_operation_receive(self.config.poll_frames(), subsys=self.selected_ecu)
-        if (not isinstance(resp, str)) and resp[:2].hex() == '0000':
+        elif (self.is_test_checked()):
             self.start = True
             self.init_button.setDisabled(True)
 
@@ -282,10 +279,22 @@ class OperationWindow(QWidget):
             self.stop_operation.setDisabled(False)
 
             self.start_label.curr = 1
-            self.logging_enable(True)
-        else:
-            QMessageBox.warning(self, 'Error',
-                                f'START_OPERATION failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
+
+        if (not self.is_test_checked()):
+            self.config.send_frames(start_operation_send(subsys=self.selected_ecu))
+            resp = start_operation_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+            if (not isinstance(resp, str)) and resp[:2].hex() == '0000':
+                self.start = True
+                self.init_button.setDisabled(True)
+
+                self.start_operation.setDisabled(True)
+                self.stop_operation.setDisabled(False)
+
+                self.start_label.curr = 1
+                #self.logging_enable(True)
+            else:
+                QMessageBox.warning(self, 'Error',
+                                    f'START_OPERATION failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
 
     def on_stop_operation(self):
         self.logging_enable(False)

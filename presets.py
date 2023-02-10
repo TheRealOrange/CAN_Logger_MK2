@@ -36,7 +36,7 @@ class Preset:
                 if (self.name != data["name"]):
                     return True
                 for p in self.parameter_set.parameter_names:
-                    if (not p in self.params):
+                    if (not p in data["parameters"]):
                         raise ValueError("Missing parameter in file!")
                     if (self.values[p] != data["parameters"][p]):
                         return True

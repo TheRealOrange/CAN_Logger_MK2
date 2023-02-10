@@ -112,6 +112,7 @@ class OperationConfigWindow(QWidget):
         self.reload_fromfile_button.setDisabled(True)
 
     def load_presets(self):
+        self.list_view.clear()
         self.list_view.addItem('default')
         self.list_view.addItems([p.name for p in self.config.presets if p.name != 'default'])
         self.sel_default()
