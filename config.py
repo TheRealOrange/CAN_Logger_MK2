@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from canlib import canlib, Frame, connected_devices
 from canlib.canlib import MessageFlag
 
@@ -6,8 +8,14 @@ from presets import PresetList
 
 from driver_mk2 import *
 
+from datetime import datetime
+import logging
+import sys
+
 sent_params_file = "parameters_send.csv"
 get_params_file = "parameters_get.csv"
+
+logdir = "./logs"
 
 DEBUGGING = False
 
@@ -18,6 +26,11 @@ def gen_frame(hx_id: int, hx_data: bytes) -> Frame:
 
 class Config:
     def __init__(self):
+        self.print_log_filename = Path(logdir) / datetime.now().strftime("%Y_%b_%d-%H_%M_%S.log")
+        self.targets = logging.StreamHandler(sys.stdout), logging.FileHandler(str(self.print_log_filename), encoding="utf-8")
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG, handlers=self.targets, encoding="utf-8")
+        self.logger = logging.getLogger(__name__)
+
         self.test_mode = False
         self.initialized = False
         self.logging = False
@@ -29,20 +42,22 @@ class Config:
 
         self.ch = None
 
-        print(self.sent_parameters)
-        print(" ")
-        print(self.get_parameters)
+        self.logger.info(self.sent_parameters)
+        self.logger.info(self.get_parameters)
 
-        print('Setting up CANLib...')
+        self.logger.info('Setting up CANLib...')
         for dev in connected_devices():
-            print(dev.probe_info())
+            self.logger.debug(str(dev.probe_info()))
 
         self.set_up_channel()
-        print('CanLib setup complete!')
-        print("canlib version:", canlib.dllversion())
+        self.logger.info('CanLib setup complete!')
+        self.logger.debug(f"canlib version: {str(canlib.dllversion())}")
+
+    def exit(self):
+        self.logger.info("exiting")
 
     def new_log(self):
-        self.get_log = ParameterLog(self.get_parameters, logdir="./logs")
+        self.get_log = ParameterLog(self.get_parameters, logdir=logdir)
 
     def set_up_channel(self):
         if (not DEBUGGING):
@@ -56,17 +71,17 @@ class Config:
 
     def send_frames(self, frames):
         for frame in frames:
-            print(f'{datetime.now().isoformat()} -> sending ', hex(frame[0]), frame[1].hex())
+            self.logger.debug(f"{datetime.now().isoformat()} -> CAN sending: id {hex(frame[0])} | data {frame[1].hex()}")
             if (not DEBUGGING):
                 self.ch.write(gen_frame(frame[0], frame[1]))
 
     def receive_frame(self, timeout: int) -> Frame:
         frame = self.ch.read(timeout)
-        print(f'{datetime.now().isoformat()} -> received', hex(frame.id), frame.data.hex())
+        self.logger.debug(f"{datetime.now().isoformat()} -> CAN receive: id {hex(frame.id)} | data {frame.data.hex()}")
         return frame
 
     def poll_frames(self):
-        frame = self.receive_frame(-1)
+        frame = self.receive_frame(1000)
         buffer = frame.id
         buffer >>= pad_bits
         frame_cnt = buffer & ((1 << 8) - 1)

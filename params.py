@@ -42,7 +42,7 @@ class Parameter:
         return self._value.to_bytes(self.byte_len, byteorder='big', signed=self.signed)
 
     def __repr__(self):
-        return f"{self.name:<33}-> units: {self.units:>5} | offset: {self.offset:>3} | bounds: ({self.min:>5}, {self.max:>5}) | default: {self.default:>5}"
+        return f"{self.name:<33}-> value: {self.value:>5} | units: {self.units:>5} | offset: {self.offset:>3} | bounds: ({self.min:>5}, {self.max:>5}) | default: {self.default:>5}"
 
 
 class ParameterSet:

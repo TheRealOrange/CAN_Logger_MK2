@@ -1,5 +1,6 @@
 import time
 
+import canlib
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (
     QWidget,
@@ -13,6 +14,7 @@ from PyQt6.QtWidgets import (
 )
 
 from PyQt6.QtGui import QPalette, QColor, QFont
+from canlib.canlib import CanNoMsg
 
 from config import Config
 from widget_state_label import StateLabel
@@ -218,7 +220,14 @@ class OperationWindow(QWidget):
 
     def on_init_payload(self):
         self.config.send_frames(init_payload_send(self.is_test_checked(), subsys=self.selected_ecu))
-        resp = init_payload_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+        self.config.logger.info(f'{datetime.now().isoformat()} -> INIT_PAYL sent')
+        try:
+            resp = init_payload_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+        except CanNoMsg as e:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> INIT_PAYL timed out!')
+            QMessageBox.warning(self, 'Error',
+                                f'INIT_PAYL timed out!')
+            return
 
         if (not isinstance(resp, str)) and resp[:2].hex() == '0000':
             self.init = True
@@ -234,13 +243,22 @@ class OperationWindow(QWidget):
             self.logging_toggle.setDisabled(False)
             self.init_label.curr = 1
         else:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> INIT_PAYL failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
             QMessageBox.warning(self, 'Error',
                                 f'INIT_PAYL failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
 
     def on_stop_payload(self):
         self.logging_enable(False)
         self.config.send_frames(stop_payload_send(subsys=self.selected_ecu))
-        resp = stop_payload_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+        self.config.logger.info(f'{datetime.now().isoformat()} -> STOP_PAYL sent')
+        try:
+            resp = stop_payload_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+        except CanNoMsg as e:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> STOP_PAYL timed out!')
+            QMessageBox.warning(self, 'Error',
+                                f'STOP_PAYL timed out!')
+            return
+
 
         if (not isinstance(resp, str)) and resp[:2].hex() == '0000':
             self.init = False
@@ -259,17 +277,43 @@ class OperationWindow(QWidget):
             self.init_label.curr = 0
             self.start_label.curr = 0
         else:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> STOP_PAYL failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
             QMessageBox.warning(self, 'Error',
                                 f'STOP_PAYL failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
+            ok = QMessageBox.question(self, 'Reset Anyway', f"Do you want to reset the GUI state anyway?")
+            if ok:
+                self.init = False
+                self.start = False
+
+                self.ecu_sel_combo.setDisabled(False)
+                self.init_button.setDisabled(True)
+
+                self.start_operation.setDisabled(True)
+                self.stop_operation.setDisabled(True)
+
+                self.set_time_button.setDisabled(True)
+
+                self.test_mode_check.setDisabled(True)
+                self.logging_toggle.setDisabled(True)
+                self.init_label.curr = 0
+                self.start_label.curr = 0
 
     def on_start_operation(self):
-        print(self.config.sent_parameters)
+        self.config.logger.info(self.config.sent_parameters)
         self.config.send_frames(data_send_send(self.config.sent_parameters.pack(), test=self.is_test_checked(), subsys=self.selected_ecu))
-        resp = data_send_receive(self.config.poll_frames(), test=self.is_test_checked(), subsys=self.selected_ecu)
+        self.config.logger.info(f'{datetime.now().isoformat()} -> {"DATA_SEND" if (not self.is_test_checked()) else "DATA_SEND_TEST_MODE"} sent')
+        try:
+            resp = data_send_receive(self.config.poll_frames(), test=self.is_test_checked(), subsys=self.selected_ecu)
+        except CanNoMsg as e:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> {"DATA_SEND" if (not self.is_test_checked()) else "DATA_SEND_TEST_MODE"} timed out!')
+            QMessageBox.warning(self, 'Error',
+                                f'{"DATA_SEND" if (not self.is_test_checked()) else "DATA_SEND_TEST_MODE"} timed out!')
+            return
 
         if (isinstance(resp, str)) or resp[:2].hex() != '0000':
+            self.config.logger.error(f'{datetime.now().isoformat()} -> {"DATA_SEND" if (not self.is_test_checked()) else "DATA_SEND_TEST_MODE"} failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
             QMessageBox.warning(self, 'Error',
-                                f'DATA_SEND failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
+                                f'{"DATA_SEND" if (not self.is_test_checked()) else "DATA_SEND_TEST_MODE"} failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
             return
         elif (self.is_test_checked()):
             self.start = True
@@ -282,7 +326,14 @@ class OperationWindow(QWidget):
 
         if (not self.is_test_checked()):
             self.config.send_frames(start_operation_send(subsys=self.selected_ecu))
-            resp = start_operation_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+            self.config.logger.info(f'{datetime.now().isoformat()} -> START_OPERATION sent')
+            try:
+                resp = start_operation_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+            except CanNoMsg as e:
+                self.config.logger.error(f'{datetime.now().isoformat()} -> START_OPERATION timed out!')
+                QMessageBox.warning(self, 'Error', f'START_OPERATION timed out!')
+                return
+
             if (not isinstance(resp, str)) and resp[:2].hex() == '0000':
                 self.start = True
                 self.init_button.setDisabled(True)
@@ -293,26 +344,39 @@ class OperationWindow(QWidget):
                 self.start_label.curr = 1
                 #self.logging_enable(True)
             else:
+                self.config.logger.error(f'{datetime.now().isoformat()} -> START_OPERATION failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
                 QMessageBox.warning(self, 'Error',
                                     f'START_OPERATION failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
 
     def on_stop_operation(self):
         self.logging_enable(False)
         self.config.send_frames(stop_operation_send(test=self.is_test_checked(), subsys=self.selected_ecu))
-        resp = stop_operation_receive(self.config.poll_frames(), test=self.is_test_checked(), subsys=self.selected_ecu)
+        self.config.logger.info(f'{datetime.now().isoformat()} -> STOP_OPERATION sent')
+        try:
+            resp = stop_operation_receive(self.config.poll_frames(), test=self.is_test_checked(), subsys=self.selected_ecu)
+        except CanNoMsg as e:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> STOP_OPERATION timed out!')
+            QMessageBox.warning(self, 'Error',
+                                f'STOP_OPERATION timed out!')
+            return
+
         if (not isinstance(resp, str)) and resp[:2].hex() == '0000':
             self.start = False
             self.init = False
             self.init_button.setDisabled(False)
 
+            self.ecu_sel_combo.setDisabled(False)
             self.start_operation.setDisabled(True)
             self.stop_operation.setDisabled(True)
             self.logging_toggle.setDisabled(True)
             self.set_time_button.setDisabled(True)
 
+            self.test_mode_check.setDisabled(False)
+
             self.start_label.curr = 0
             self.init_label.curr = 0
         else:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> STOP_OPERATION failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
             QMessageBox.warning(self, 'Error',
                                 f'STOP_OPERATION failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
 
@@ -325,9 +389,17 @@ class OperationWindow(QWidget):
                                               dt.time().minute,
                                               dt.time().second,
                                               subsys=self.selected_ecu))
-        resp = set_time_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+        self.config.logger.info(f'{datetime.now().isoformat()} -> SET_TIME sent')
+        try:
+            resp = set_time_receive(self.config.poll_frames(), subsys=self.selected_ecu)
+        except CanNoMsg as e:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> SET_TIME timed out!')
+            QMessageBox.warning(self, 'Error',
+                                f'SET_TIME timed out!')
+            return
 
         if (isinstance(resp, str)) or resp[:2].hex() != '0000':
+            self.config.logger.error(f'{datetime.now().isoformat()} -> SET_TIME failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
             QMessageBox.warning(self, 'Error',
                                 f'SET_TIME failed: {resp if isinstance(resp, str) else f"Error Vector: {resp[:2].hex()}"}')
             return
@@ -338,7 +410,7 @@ class OperationWindow(QWidget):
         self.date_picker.setDisabled(self.is_currtime_checked())
 
     def logging_enable(self, start: bool):
-        if (start):
+        if (start and not self.live_log):
             if not self.live_log:
                 self.config.new_log()
                 self.timer = QTimer()
@@ -348,7 +420,7 @@ class OperationWindow(QWidget):
                 self.live_log = True
                 self.logging_label.curr = 1
                 self.logging_toggle.setText("Stop Log")
-        else:
+        elif (not start and self.live_log):
             self.timer.stop()
             self.live_log = False
             self.logging_label.curr = 0
@@ -356,15 +428,22 @@ class OperationWindow(QWidget):
 
     def load_recv(self) -> bool:
         """Load data get into receive buffer and check if output is valid"""
-        fr = data_get_receive(self.config.poll_frames())
+        try:
+            fr = data_get_receive(self.config.poll_frames())
+        except CanNoMsg as e:
+            self.config.logger.error(f'{datetime.now().isoformat()} -> DATA_GET timed out!')
+            QMessageBox.warning(self, 'Error',
+                                f'DATA_GET timed out!')
+            return False
+
         if isinstance(fr, str):
-            print(fr)
+            self.config.logger.error(f"{datetime.now().isoformat()} -> {fr}")
             self.recv = None
             return False
 
         if not fr[:2].hex() == '0000':
             # we have an error
-            print(f"DATA_GET Response Error: {fr[:2].hex()}")
+            self.config.logger.error(f"{datetime.now().isoformat()} -> DATA_GET Response Error: {fr[:2].hex()}")
             self.recv = None
             return False
         self.recv = fr[8:]
@@ -377,6 +456,7 @@ class OperationWindow(QWidget):
 
         # data get frames
         self.config.send_frames(data_get_send(subsys=self.selected_ecu))
+        self.config.logger.info(f'{datetime.now().isoformat()} -> DATA_GET sent')
 
         if not self.load_recv():
             return

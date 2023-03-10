@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import (
     QMainWindow,
     QPushButton,
     QTabWidget,
-    QWidget,
+    QWidget, QMessageBox,
 )
 
 from config import Config
@@ -35,6 +35,16 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(tabs)
 
         self.setWindowTitle("ELITE ECU Operations")
+
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, 'Exit', 'Are you sure you want to exit?')
+
+        if reply:
+            event.accept()
+            self.config.exit()
+            print('Window closed')
+        else:
+            event.ignore()
 
 
 app = QApplication(sys.argv)
